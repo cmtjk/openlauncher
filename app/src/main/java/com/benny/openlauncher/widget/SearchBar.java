@@ -29,7 +29,10 @@ import android.view.WindowInsets;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
+import com.afollestad.materialdialogs.MaterialDialog;
+import com.benny.openlauncher.BuildConfig;
 import com.benny.openlauncher.R;
+import com.benny.openlauncher.activity.HomeActivity;
 import com.benny.openlauncher.interfaces.AppUpdateListener;
 import com.benny.openlauncher.manager.Setup;
 import com.benny.openlauncher.model.App;
@@ -279,6 +282,29 @@ public class SearchBar extends FrameLayout {
         addView(_searchRecycler, recyclerParams);
         addView(_searchCardContainer, inputCardParams);
         addView(_searchButton, buttonParams);
+
+        if (BuildConfig.IS_PATCHED_BUILD) {
+            TextView versionInfo = new TextView(this.getContext());
+            versionInfo.setText(BuildConfig.VERSION_NAME);
+            versionInfo.setTextSize(10);
+            versionInfo.setTextColor(Color.WHITE);
+            LayoutParams versionInfoParams = new LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            versionInfoParams.setMargins(0, -(dp1 * 7), 8, 0);
+            versionInfoParams.gravity = Gravity.END;
+            versionInfo.setOnLongClickListener(l -> {
+                new MaterialDialog.Builder(HomeActivity._launcher)
+                        .title("Version Info")
+                        .content(BuildConfig.VERSION_NAME)
+                        .negativeText(android.R.string.cancel)
+                        .positiveText(R.string.pref_title__restart)
+                        .onPositive((__a, __b) -> {
+                            HomeActivity._launcher.recreate();
+                        })
+                        .show();
+                return true;
+            });
+            addView(versionInfo, versionInfoParams);
+        }
 
         _searchInput.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
